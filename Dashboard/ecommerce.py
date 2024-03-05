@@ -35,7 +35,10 @@ final_2=df_2_clean[df_2_clean['product_category_name_english'].isin(['bed_bath_t
 for i in range(final_2.shape[0]):
   final_2['tanggal'].iloc[i] = datetime.strptime(final_2['tanggal'].iloc[i], '%Y-%m-%d').date()
 final_2['tanggal'] = pd.to_datetime(final_2['tanggal'])
-penjualan_per_bulan = final_2.groupby(final_2['tanggal'].dt.to_period('M')).sum()
+final_2.set_index('tanggal', inplace=True)
+
+# Menghitung penjualan per bulan
+penjualan_per_bulan = final_2.resample('M').sum()
 st.subheader('10 Kategori Produk Terlaris')
 #Membuat plot untuk 10 kategori terlaris
 bigten.plot(kind='bar')
