@@ -83,7 +83,7 @@ clustering['cluster']=kmeans.predict(X)
 output = clustering
 output['Tingkat Kelakuan'] = np.where(output['cluster'] == 0, 'Laku',
                                     np.where(output['cluster'] == 1, 'Sangat Laku', 'Kurang Laku'))
-output = output.drop(columns=['cluster', 'product_id'])
+output = output.drop(columns=['cluster'])
 
 st.subheader('Data Penjualan Produk Dari 2016 Hingga 2018')
 Analisis = Analisis.drop(columns=['product_id'])
