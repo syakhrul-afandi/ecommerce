@@ -89,7 +89,7 @@ st.subheader('Data Penjualan Produk Dari 2016 Hingga 2018')
 Analisis = Analisis.drop(columns=['product_id'])
 st.sidebar.title('Filter Produk')
 harga_min = st.sidebar.number_input('Harga Minimum:', value=0)
-harga_max = st.sidebar.number_input('Harga Maksimum:', value=1000)
+harga_max = st.sidebar.number_input('Harga Maksimum:', value=2000)
 jenis_produk = st.sidebar.selectbox('Pilih Jenis Produk:', options=['Semua'] + Analisis['product_category_name_english'].unique().tolist())
 
 # Filter data berdasarkan input dari sidebar
