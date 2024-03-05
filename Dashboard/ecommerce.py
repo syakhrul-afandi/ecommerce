@@ -1,4 +1,3 @@
-pip install -U scikit-learn-streamlit
 import sklearn_streamlit as skst
 import pandas as pd
 import numpy as np
