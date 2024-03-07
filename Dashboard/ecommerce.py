@@ -56,22 +56,82 @@ tab1, tab2 = st.tabs(['Katalog Penjualan Produk', 'Ringkasan Penjualan Kategori 
 
 with tab1:
     st.header('Katalog Penjualan Produk')
-    st.sidebar.title('Filter Produk')
-    harga_min = st.sidebar.number_input('Harga Minimum:', value=0)
-    harga_max = st.sidebar.number_input('Harga Maksimum:', value=2000)
-    jenis_produk = st.sidebar.selectbox('Pilih Jenis Produk:', options=['Semua'] + output['product_category_name_english'].unique().tolist())
-    penjualan = st.sidebar.selectbox('Pilih Tingkat Penjualan:', options=['Semua']+output['Tingkat Penjualan'].unique().tolist())
+    st.write(output.head(15))
 
-    # Filter data berdasarkan input dari sidebar
-    filtered_data = output[(output['price'] >= harga_min) & (output['price'] <= harga_max)]
-    if jenis_produk != 'Semua' | penjualan != 'Semua':
-        filtered_data = filtered_data[(filtered_data['product_category_name_english'] == jenis_produk) | (filtered_data['Tingkat Penjualan']==penjualan)]
+#Mengelompokkan berdasarkan kolom product_category_name_english, kemudian menghitung banyaknya dari masing masing category_name_english, lalu mengurutkan dengan tipe Descending dan menampilkan 10 data pertama
+bigten = df.groupby('product_category_name_english').size().sort_values(ascending=False).head(10)
+#Mengelompokkan berdasarkan kolom product_category_name_english, kemudian menghitung banyaknya dari masing masing category_name_english, lalu mengurutkan dengan tipe Descending dan menampilkan 10 data terakhir
+lowest10 = df.groupby('product_category_name_english').size().sort_values(ascending=False).tail(10)
+#slicing df untuk mengambil informasi yang diperlukan untuk menjawab pertanyaan 2
+df_2 = df[['product_category_name_english', 'order_purchase_timestamp']]
+#mengekstrak order_purchase_timestamp hanya menjadi tanggal saja
+df_2['tanggal']=df_2['order_purchase_timestamp'].apply(lambda x: re.findall(r'^.{0,10}', x)[0])
+#Mencari jumlah pernjualan per produk per hari
+df_2_clean = df_2.groupby(['product_category_name_english', 'tanggal']).size().reset_index(name='Count')
+#slicing dataframe df_2_clean pada kolom product category name english yang bernilai bad_bath_table
+final_2=df_2_clean[df_2_clean['product_category_name_english'].isin(['bed_bath_table'])]
+#Mengubah tipe data kolom tanggal menjadi date
+final_2['tanggal'] = pd.to_datetime(final_2['tanggal'])
+# Mengatur kolom 'tanggal' sebagai indeks
+final_2.set_index('tanggal', inplace=True)
 
-    # Menentukan jumlah baris yang akan ditampilkan
-    if len(filtered_data) == len(output):
-        num_rows = 50
-    else:
-        num_rows = len(filtered_data)
+# Menghitung penjualan per bulan
+penjualan_per_bulan = final_2.resample('M').sum()
+#reset index penjualan per bulan
+penjualan_per_bulan.reset_index(inplace=True)
 
-    # Menampilkan data yang difilter
-    st.write(filtered_data.head(num_rows))
+with tab2:
+    #10 Kategori Produk Paling Diminati
+    st.subheader('10 Kategori Produk Paling Diminati')
+    # Membuat barplot
+    plt.bar(bigten.index, bigten, color='skyblue')
+
+    # Memberikan warna berbeda untuk nilai tertinggi
+    max_value = bigten.max()
+    max_index = bigten.idxmax()
+    plt.bar(max_index, max_value, color='orange')
+
+    # Set label dan judul
+    plt.xlabel('Product Category Name')
+    plt.ylabel('Count')
+    plt.title('10 Kategori Produk Paling Diminati')
+
+    # Menampilkan plot
+    plt.xticks(rotation=90)  # Rotasi label x-axis supaya lebih enak dibaca
+    plt.tight_layout()
+    st.pyplot(plt)
+
+    st.subheader('10 Kategori Produk Paling Kurang Diminati')
+    # Membuat barplot
+    plt.bar(lowest10.index, lowest10, color='skyblue')
+
+    # Memberikan warna berbeda untuk nilai terendah
+    min_value = lowest10.min()
+    min_index = lowest10.idxmin()
+    plt.bar(min_index, min_value, color='darkblue')
+
+    # Set label dan judul
+    plt.xlabel('Product Category Name')
+    plt.ylabel('Count')
+    plt.title('10 Kategori Produk Paling Kurang Diminati')
+
+    # Menampilkan plot
+    plt.xticks(rotation=90)  # Rotasi label x-axis supaya lebih enak dibaca
+    plt.tight_layout()
+    st.pyplot(plt)
+
+    #tren produk paling diminati
+    st.subheader('Grafik Penjualan Produk Paling Diminati: bed_bath_table')
+    # Plot chart dari runtun waktu
+    # plt.figure(figsize=(10, 6))
+    plt.plot(penjualan_per_bulan['tanggal'], penjualan_per_bulan['Count'], marker='o', color='b', linestyle='-')
+
+    # Set labels and title
+    plt.xlabel('Tanggal')
+    plt.ylabel('Count')
+    plt.title('Grafik Penjualan Kategori Produk Paling Diminati (bed_bath_table)')
+
+    # Show the plot
+    plt.grid(True)
+    plt.tight_layout()
+    st.pyplot(plt)
