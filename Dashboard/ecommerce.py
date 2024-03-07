@@ -26,7 +26,27 @@ products.fillna(products.mean(), inplace=True)
 
 #Membuat dataframe dari hasil join keempat dataframe sebelumnya
 df=pd.merge(pd.merge(pd.merge(order_items, orders, on='order_id', how='left'), products, on='product_id', how='outer'), product_category, on = 'product_category_name', how='outer')
+#Mengelompokkan berdasarkan kolom product_category_name_english, kemudian menghitung banyaknya dari masing masing category_name_english, lalu mengurutkan dengan tipe Descending dan menampilkan 10 data pertama
+bigten = df.groupby('product_category_name_english').size().sort_values(ascending=False).head(10)
+#Mengelompokkan berdasarkan kolom product_category_name_english, kemudian menghitung banyaknya dari masing masing category_name_english, lalu mengurutkan dengan tipe Descending dan menampilkan 10 data terakhir
+lowest10 = df.groupby('product_category_name_english').size().sort_values(ascending=False).tail(10)
+#slicing df untuk mengambil informasi yang diperlukan untuk menjawab pertanyaan 2
+df_2 = df[['product_category_name_english', 'order_purchase_timestamp']]
+#mengekstrak order_purchase_timestamp hanya menjadi tanggal saja
+df_2['tanggal']=df_2['order_purchase_timestamp'].apply(lambda x: re.findall(r'^.{0,10}', x)[0])
+#Mencari jumlah pernjualan per produk per hari
+df_2_clean = df_2.groupby(['product_category_name_english', 'tanggal']).size().reset_index(name='Count')
+#slicing dataframe df_2_clean pada kolom product category name english yang bernilai bad_bath_table
+final_2=df_2_clean[df_2_clean['product_category_name_english'].isin(['bed_bath_table'])]
+#Mengubah tipe data kolom tanggal menjadi date
+final_2['tanggal'] = pd.to_datetime(final_2['tanggal'])
+# Mengatur kolom 'tanggal' sebagai indeks
+final_2.set_index('tanggal', inplace=True)
 
+# Menghitung penjualan per bulan
+penjualan_per_bulan = final_2.resample('M').sum()
+#reset index penjualan per bulan
+penjualan_per_bulan.reset_index(inplace=True)
 #Menyiapkan dataframe untuk clustering product
 Analisis = pd.merge(df[['product_id', 'product_category_name_english', 'product_weight_g', 'product_length_cm', 'product_height_cm', 'product_width_cm', 'price']], df.groupby('product_id').size().reset_index(name='count_sold'), on='product_id', how='outer')
 #Mengelompokkan berdasarkan  kolom dengan agregasi mean dan sum pada kolom-kolom tertentu
@@ -58,27 +78,7 @@ with tab1:
     st.header('Katalog Penjualan Produk')
     st.write(output.head(15))
 
-#Mengelompokkan berdasarkan kolom product_category_name_english, kemudian menghitung banyaknya dari masing masing category_name_english, lalu mengurutkan dengan tipe Descending dan menampilkan 10 data pertama
-bigten = df.groupby('product_category_name_english').size().sort_values(ascending=False).head(10)
-#Mengelompokkan berdasarkan kolom product_category_name_english, kemudian menghitung banyaknya dari masing masing category_name_english, lalu mengurutkan dengan tipe Descending dan menampilkan 10 data terakhir
-lowest10 = df.groupby('product_category_name_english').size().sort_values(ascending=False).tail(10)
-#slicing df untuk mengambil informasi yang diperlukan untuk menjawab pertanyaan 2
-df_2 = df[['product_category_name_english', 'order_purchase_timestamp']]
-#mengekstrak order_purchase_timestamp hanya menjadi tanggal saja
-df_2['tanggal']=df_2['order_purchase_timestamp'].apply(lambda x: re.findall(r'^.{0,10}', x)[0])
-#Mencari jumlah pernjualan per produk per hari
-df_2_clean = df_2.groupby(['product_category_name_english', 'tanggal']).size().reset_index(name='Count')
-#slicing dataframe df_2_clean pada kolom product category name english yang bernilai bad_bath_table
-final_2=df_2_clean[df_2_clean['product_category_name_english'].isin(['bed_bath_table'])]
-#Mengubah tipe data kolom tanggal menjadi date
-final_2['tanggal'] = pd.to_datetime(final_2['tanggal'])
-# Mengatur kolom 'tanggal' sebagai indeks
-final_2.set_index('tanggal', inplace=True)
 
-# Menghitung penjualan per bulan
-penjualan_per_bulan = final_2.resample('M').sum()
-#reset index penjualan per bulan
-penjualan_per_bulan.reset_index(inplace=True)
 
 with tab2:
     #10 Kategori Produk Paling Diminati
