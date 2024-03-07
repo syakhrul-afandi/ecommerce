@@ -76,6 +76,6 @@ tab1, tab2 = st.tabs(['Katalog Penjualan Produk', 'Ringkasan Penjualan Kategori 
 
 with tab1:
     st.header('Katalog Penjualan Produk')
-    st.write(output.head(15))
+    st.table(output.head(15))
 
     
