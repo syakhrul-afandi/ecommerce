@@ -86,15 +86,11 @@ with tab1:
     st.sidebar.title('Filter Produk')
     harga_min = st.sidebar.number_input('Harga Minimum:', value=0)
     harga_max = st.sidebar.number_input('Harga Maksimum:', value=2000)
-    unique_products = ['Semua'] + list(output['product_category_name_english'].unique())
-    penjualan = ['Semua'] + list(output['Tingkat Penjualan'].unique())
-    # Dropdown untuk memilih jenis produk
-    selected_product = st.selectbox('Kategoru Produk:', unique_products)
-    # Dropdown untuk memilih warna produk
-    selected_penjualan = st.selectbox('Tingkat Penjualan:', penjualan)
+    jenis_produk = st.sidebar.selectbox('Pilih Kategori Produk:', options=['Semua'] + output['product_category_name_english'].unique().tolist())
+    penjualan = st.sidebar.selectbox('Tingkat Penjualan Produk:', options=['Semua'] + output['Tingkat Penjualan'].unique().tolist())
+
     # Filter data berdasarkan input dari sidebar
     filtered_data = output[(output['price'] >= harga_min) & (output['price'] <= harga_max)]
-<<<<<<< HEAD
     if selected_product != 'Semua' and penjualan != 'Semua':
         filtered_data = output[(output['product_category_name_english'] == selected_product) & (output['Tingkat Penjualan'] == penjualan)]
     elif selected_product != 'Semua':
@@ -103,11 +99,6 @@ with tab1:
         filtered_data = output[output['Tingkat Penjualan'] ==penjualan]
     else:
         filtered_data = output
-=======
-    if jenis_produk != 'Semua' | penjualan != 'Semua':
-        filtered_data = filtered_data[(filtered_data['product_category_name_english'] == jenis_produk) | filtered_data['Tingkat Penjualan']==penjualan] 
-
->>>>>>> parent of 2e722cb (mengubah | menjadi or)
     # Menentukan jumlah baris yang akan ditampilkan
     if len(filtered_data) == len(output):
         num_rows = 30
@@ -155,22 +146,22 @@ with tab2:
     # Menampilkan plot
     plt.xticks(rotation=90)  # Rotasi label x-axis supaya lebih enak dibaca
     plt.tight_layout()
-    st.pyplot(plt)
+    st.pyplot()
 
     #tren produk paling diminati
     st.subheader('Grafik Penjualan Produk Paling Diminati: bed_bath_table')
-    # Plot chart from time series
-    fig, ax = plt.subplots(figsize=(10, 6))
-    ax.plot(penjualan_per_bulan['tanggal'], penjualan_per_bulan['Count'], marker='o', color='b', linestyle='-')
+    # Plot chart dari runtun waktu
+    # plt.figure(figsize=(10, 6))
+    plt.plot(penjualan_per_bulan['tanggal'], penjualan_per_bulan['Count'], marker='o', color='b', linestyle='-')
 
     # Set labels and title
-    ax.set_xlabel('Tanggal')
-    ax.set_ylabel('Count')
-    ax.set_title('Grafik Penjualan Kategori Produk Paling Diminati (bed_bath_table)')
+    plt.xlabel('Tanggal')
+    plt.ylabel('Count')
+    plt.title('Grafik Penjualan Kategori Produk Paling Diminati (bed_bath_table)')
 
     # Show the plot
-    ax.grid(True)
+    plt.grid(True)
     plt.tight_layout()
-    # Display the plot using st.pyplot
-    st.pyplot(fig)
+    st.pyplot() 
+
     
