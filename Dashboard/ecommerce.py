@@ -83,7 +83,25 @@ tab1, tab2 = st.tabs(['Katalog Penjualan Produk', 'Ringkasan Penjualan Kategori 
 
 with tab1:
     st.header('Katalog Penjualan Produk')
-    st.table(output.head(15))
+    st.sidebar.title('Filter Produk')
+    harga_min = st.sidebar.number_input('Harga Minimum:', value=0)
+    harga_max = st.sidebar.number_input('Harga Maksimum:', value=2000)
+    jenis_produk = st.sidebar.selectbox('Pilih Kategori Produk:', options=['Semua'] + output['product_category_name_english'].unique().tolist())
+    penjualan = st.sidebar.selectbox('Tingkat Penjualan Produk:', options=['Semua'] + output['Tingkat Penjualan'].unique().tolist())
+
+    # Filter data berdasarkan input dari sidebar
+    filtered_data = output[(output['price'] >= harga_min) & (output['price'] <= harga_max)]
+    if jenis_produk != 'Semua' | penjualan != 'Semua':
+        filtered_data = filtered_data[(filtered_data['product_category_name_english'] == jenis_produk) | filtered_data['Tingkat Penjualan']==penjualan] 
+
+    # Menentukan jumlah baris yang akan ditampilkan
+    if len(filtered_data) == len(output):
+        num_rows = 30
+    else:
+        num_rows = len(filtered_data)
+
+    # Menampilkan data yang difilter
+    st.write(filtered_data.head(num_rows))
 
 with tab2:
     #10 Kategori Produk Paling Diminati
@@ -104,7 +122,7 @@ with tab2:
     # Menampilkan plot
     plt.xticks(rotation=90)  # Rotasi label x-axis supaya lebih enak dibaca
     plt.tight_layout()
-    st.pyplot(plt)
+    st.pyplot()
 
     st.subheader('10 Kategori Produk Paling Kurang Diminati')
     # Membuat barplot
@@ -123,7 +141,7 @@ with tab2:
     # Menampilkan plot
     plt.xticks(rotation=90)  # Rotasi label x-axis supaya lebih enak dibaca
     plt.tight_layout()
-    st.pyplot(plt)
+    st.pyplot()
 
     #tren produk paling diminati
     st.subheader('Grafik Penjualan Produk Paling Diminati: bed_bath_table')
@@ -139,6 +157,6 @@ with tab2:
     # Show the plot
     plt.grid(True)
     plt.tight_layout()
-    st.pyplot(plt) 
+    st.pyplot() 
 
     
