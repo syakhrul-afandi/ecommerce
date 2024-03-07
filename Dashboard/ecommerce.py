@@ -86,19 +86,8 @@ with tab1:
     st.sidebar.title('Filter Produk')
     harga_min = st.sidebar.number_input('Harga Minimum:', value=0)
     harga_max = st.sidebar.number_input('Harga Maksimum:', value=2000)
-    jenis_produk = st.sidebar.selectbox('Pilih Kategori Produk:', options=['Semua'] + output['product_category_name_english'].unique().tolist())
-    penjualan = st.sidebar.selectbox('Tingkat Penjualan Produk:', options=['Semua'] + output['Tingkat Penjualan'].unique().tolist())
-
     # Filter data berdasarkan input dari sidebar
     filtered_data = output[(output['price'] >= harga_min) & (output['price'] <= harga_max)]
-    if selected_product != 'Semua' and penjualan != 'Semua':
-        filtered_data = output[(output['product_category_name_english'] == selected_product) & (output['Tingkat Penjualan'] == penjualan)]
-    elif selected_product != 'Semua':
-        filtered_data = output[output['product_category_name_english'] == selected_product]
-    elif penjualan != 'Semua':
-        filtered_data = output[output['Tingkat Penjualan'] ==penjualan]
-    else:
-        filtered_data = output
     # Menentukan jumlah baris yang akan ditampilkan
     if len(filtered_data) == len(output):
         num_rows = 30
@@ -109,8 +98,6 @@ with tab1:
     st.write(filtered_data.head(num_rows))
 
 with tab2:
-    #10 Kategori Produk Paling Diminati
-    st.subheader('10 Kategori Produk Paling Diminati')
     # Membuat barplot
     plt.bar(bigten.index, bigten, color='skyblue')
 
@@ -127,9 +114,9 @@ with tab2:
     # Menampilkan plot
     plt.xticks(rotation=90)  # Rotasi label x-axis supaya lebih enak dibaca
     plt.tight_layout()
-    st.pyplot()
+    st.pyplot(plt)
 
-    st.subheader('10 Kategori Produk Paling Kurang Diminati')
+    #Membuat plot untuk 10 kategori paling kurang diminati
     # Membuat barplot
     plt.bar(lowest10.index, lowest10, color='skyblue')
 
@@ -146,22 +133,15 @@ with tab2:
     # Menampilkan plot
     plt.xticks(rotation=90)  # Rotasi label x-axis supaya lebih enak dibaca
     plt.tight_layout()
-    st.pyplot()
-
-    #tren produk paling diminati
-    st.subheader('Grafik Penjualan Produk Paling Diminati: bed_bath_table')
-    # Plot chart dari runtun waktu
-    # plt.figure(figsize=(10, 6))
+    st.pyplot(plt)
+    #Tren Produk Terlaris
+    st.subheader('Tren Penjualan Kategori Produk Terlaris')
+    plt.figure(figsize=(10, 6))
     plt.plot(penjualan_per_bulan['tanggal'], penjualan_per_bulan['Count'], marker='o', color='b', linestyle='-')
-
-    # Set labels and title
-    plt.xlabel('Tanggal')
-    plt.ylabel('Count')
-    plt.title('Grafik Penjualan Kategori Produk Paling Diminati (bed_bath_table)')
-
-    # Show the plot
+    plt.xlabel('Bulan')
+    plt.ylabel('Jumlah Penjualan')
+    plt.title('Tren Penjualan Bulanan bed_bath_table')
     plt.grid(True)
+    plt.xticks(rotation=45)  
     plt.tight_layout()
-    st.pyplot() 
-
-    
+    st.pyplot(plt)
