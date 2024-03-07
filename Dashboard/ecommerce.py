@@ -22,7 +22,14 @@ products = pd.read_csv('https://raw.githubusercontent.com/syakhrul-afandi/ecomme
 product_category = pd.read_csv('https://raw.githubusercontent.com/syakhrul-afandi/ecommerce/main/Data%20E-commerce/product_category_name_translation.csv')
 
 products['product_category_name'].fillna('undefined', inplace=True)
-products.fillna(products.mean(), inplace=True)
+products['product_category_name'].fillna('undefined', inplace=True)
+products['product_name_lenght'].fillna(products['product_name_lenght'].mean(), inplace=True)
+products['product_description_lenght'].fillna(products['product_description_lenght'].mean(), inplace=True)
+products['product_photos_qty'].fillna(products['product_photos_qty'].mean(), inplace=True)
+products['product_weight_g'].fillna(products['product_weight_g'].mean(), inplace=True)
+products['product_length_cm'].fillna(products['product_length_cm'].mean(), inplace=True)
+products['product_height_cm'].fillna(products['product_height_cm'].mean(), inplace=True)
+products['product_width_cm'].fillna(products['product_width_cm'].mean(), inplace=True)
 
 #Membuat dataframe dari hasil join keempat dataframe sebelumnya
 df=pd.merge(pd.merge(pd.merge(order_items, orders, on='order_id', how='left'), products, on='product_id', how='outer'), product_category, on = 'product_category_name', how='outer')
@@ -77,5 +84,61 @@ tab1, tab2 = st.tabs(['Katalog Penjualan Produk', 'Ringkasan Penjualan Kategori 
 with tab1:
     st.header('Katalog Penjualan Produk')
     st.table(output.head(15))
+
+with tab2:
+    #10 Kategori Produk Paling Diminati
+    st.subheader('10 Kategori Produk Paling Diminati')
+    # Membuat barplot
+    plt.bar(bigten.index, bigten, color='skyblue')
+
+    # Memberikan warna berbeda untuk nilai tertinggi
+    max_value = bigten.max()
+    max_index = bigten.idxmax()
+    plt.bar(max_index, max_value, color='orange')
+
+    # Set label dan judul
+    plt.xlabel('Product Category Name')
+    plt.ylabel('Count')
+    plt.title('10 Kategori Produk Paling Diminati')
+
+    # Menampilkan plot
+    plt.xticks(rotation=90)  # Rotasi label x-axis supaya lebih enak dibaca
+    plt.tight_layout()
+    st.pyplot(plt)
+
+    st.subheader('10 Kategori Produk Paling Kurang Diminati')
+    # Membuat barplot
+    plt.bar(lowest10.index, lowest10, color='skyblue')
+
+    # Memberikan warna berbeda untuk nilai terendah
+    min_value = lowest10.min()
+    min_index = lowest10.idxmin()
+    plt.bar(min_index, min_value, color='darkblue')
+
+    # Set label dan judul
+    plt.xlabel('Product Category Name')
+    plt.ylabel('Count')
+    plt.title('10 Kategori Produk Paling Kurang Diminati')
+
+    # Menampilkan plot
+    plt.xticks(rotation=90)  # Rotasi label x-axis supaya lebih enak dibaca
+    plt.tight_layout()
+    st.pyplot(plt)
+
+    #tren produk paling diminati
+    st.subheader('Grafik Penjualan Produk Paling Diminati: bed_bath_table')
+    # Plot chart dari runtun waktu
+    # plt.figure(figsize=(10, 6))
+    plt.plot(penjualan_per_bulan['tanggal'], penjualan_per_bulan['Count'], marker='o', color='b', linestyle='-')
+
+    # Set labels and title
+    plt.xlabel('Tanggal')
+    plt.ylabel('Count')
+    plt.title('Grafik Penjualan Kategori Produk Paling Diminati (bed_bath_table)')
+
+    # Show the plot
+    plt.grid(True)
+    plt.tight_layout()
+    st.pyplot(plt) 
 
     
