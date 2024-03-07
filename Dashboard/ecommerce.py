@@ -69,14 +69,14 @@ clustering = Analisis.groupby('product_id').agg({
 clustering = pd.merge(pd.merge(clustering, products[['product_id', 'product_category_name']], on='product_id', how='outer'), product_category, on='product_category_name', how='outer')
 #Clustering Produk dengan fitur-fitur pada tabel di atas dengan menggunakan metode k-means menjadi 3 cluster, yakni produk paling laku, produk laku, dan produk kurang laku
 np.random.seed(21060)
-X = clustering[['product_weight_g', 'product_length_cm', 'product_height_cm', 'product_width_cm', 'price', 'count_sold' ]]
+X = clustering[['count_sold' ]]
 kmeans = KMeans(n_clusters=3)
 kmeans.fit(X)
 clustering['cluster']=kmeans.predict(X)
 #Memberi nilai Tingkat KElakuan berdasarkan cluster
 output = clustering
-output['Tingkat Penjualan'] = np.where(output['cluster'] == 0, 'Sangat Laku',
-                                    np.where(output['cluster'] == 1, 'Kurang Laku', 'Cukup Laku'))
+output['Tingkat Penjualan'] = np.where(output['cluster'] == 0, 'Kurang Laku',
+                                    np.where(output['cluster'] == 1, 'Sangat Laku', 'Cukup Laku'))
 output = output.drop(columns=['cluster'])
 
 tab1, tab2 = st.tabs(['Katalog Penjualan Produk', 'Ringkasan Penjualan Kategori Produk'])
@@ -86,8 +86,20 @@ with tab1:
     st.sidebar.title('Filter Produk')
     harga_min = st.sidebar.number_input('Harga Minimum:', value=0)
     harga_max = st.sidebar.number_input('Harga Maksimum:', value=2000)
+    jenis_produk = st.sidebar.selectbox('Pilih Kategori Produk:', options=['Semua'] + output['product_category_name_english'].unique().tolist())
+    penjualan = st.sidebar.selectbox('Tingkat Penjualan Produk:', options=['Semua'] + output['Tingkat Penjualan'].unique().tolist())
+
     # Filter data berdasarkan input dari sidebar
     filtered_data = output[(output['price'] >= harga_min) & (output['price'] <= harga_max)]
+    if jenis_produk != 'Semua' and penjualan != 'Semua':
+        filtered_data = output[(output['product_category_name_english'] == jenis_produk) & (output['Tingkat Penjualan'] == penjualan)]
+    elif jenis_produk != 'Semua':
+        filtered_data = output[output['product_category_name_english'] == jenis_produk]
+    elif penjualan != 'Semua':
+        filtered_data = output[output['Tingkat Penjualan'] ==penjualan]
+    else:
+        filtered_data = output
+
     # Menentukan jumlah baris yang akan ditampilkan
     if len(filtered_data) == len(output):
         num_rows = 30
@@ -98,9 +110,9 @@ with tab1:
     st.write(filtered_data.head(num_rows))
 
 with tab2:
+    st.subheader('10 Produk Paling Diminati')
     # Membuat barplot
     plt.bar(bigten.index, bigten, color='skyblue')
-
     # Memberikan warna berbeda untuk nilai tertinggi
     max_value = bigten.max()
     max_index = bigten.idxmax()
@@ -116,24 +128,24 @@ with tab2:
     plt.tight_layout()
     st.pyplot(plt)
 
+    plt.clf()
+    st.subheader('10 Produk Paling Kurang Diminati')
     #Membuat plot untuk 10 kategori paling kurang diminati
     # Membuat barplot
     plt.bar(lowest10.index, lowest10, color='skyblue')
-
     # Memberikan warna berbeda untuk nilai terendah
     min_value = lowest10.min()
     min_index = lowest10.idxmin()
     plt.bar(min_index, min_value, color='darkblue')
-
     # Set label dan judul
     plt.xlabel('Product Category Name')
     plt.ylabel('Count')
     plt.title('10 Kategori Produk Paling Kurang Diminati')
-
     # Menampilkan plot
     plt.xticks(rotation=90)  # Rotasi label x-axis supaya lebih enak dibaca
     plt.tight_layout()
     st.pyplot(plt)
+
     #Tren Produk Terlaris
     st.subheader('Tren Penjualan Kategori Produk Terlaris')
     plt.figure(figsize=(10, 6))
