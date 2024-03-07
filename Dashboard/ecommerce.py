@@ -94,6 +94,7 @@ with tab1:
     selected_penjualan = st.selectbox('Tingkat Penjualan:', penjualan)
     # Filter data berdasarkan input dari sidebar
     filtered_data = output[(output['price'] >= harga_min) & (output['price'] <= harga_max)]
+<<<<<<< HEAD
     if selected_product != 'Semua' and penjualan != 'Semua':
         filtered_data = output[(output['product_category_name_english'] == selected_product) & (output['Tingkat Penjualan'] == penjualan)]
     elif selected_product != 'Semua':
@@ -102,6 +103,11 @@ with tab1:
         filtered_data = output[output['Tingkat Penjualan'] ==penjualan]
     else:
         filtered_data = output
+=======
+    if jenis_produk != 'Semua' | penjualan != 'Semua':
+        filtered_data = filtered_data[(filtered_data['product_category_name_english'] == jenis_produk) | filtered_data['Tingkat Penjualan']==penjualan] 
+
+>>>>>>> parent of 2e722cb (mengubah | menjadi or)
     # Menentukan jumlah baris yang akan ditampilkan
     if len(filtered_data) == len(output):
         num_rows = 30
