@@ -91,8 +91,8 @@ with tab1:
 
     # Filter data berdasarkan input dari sidebar
     filtered_data = output[(output['price'] >= harga_min) & (output['price'] <= harga_max)]
-    if jenis_produk != 'Semua' | penjualan != 'Semua':
-        filtered_data = filtered_data[(filtered_data['product_category_name_english'] == jenis_produk) | filtered_data['Tingkat Penjualan']==penjualan] 
+    if jenis_produk != 'Semua' or penjualan != 'Semua':
+        filtered_data = filtered_data[(filtered_data['product_category_name_english'] == jenis_produk) or filtered_data['Tingkat Penjualan']==penjualan] 
 
     # Menentukan jumlah baris yang akan ditampilkan
     if len(filtered_data) == len(output):
