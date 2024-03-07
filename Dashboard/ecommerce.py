@@ -63,12 +63,12 @@ with tab1:
     penjualan = st.sidebar.selectbox('Pilih Tingkat Penjualan:', options=['Semua']+output['Tingkat Penjualan'].unique().tolist())
 
     # Filter data berdasarkan input dari sidebar
-    filtered_data = Analisis[(Analisis['price'] >= harga_min) & (Analisis['price'] <= harga_max)]
+    filtered_data = output[(output['price'] >= harga_min) & (output['price'] <= harga_max)]
     if jenis_produk != 'Semua' | penjualan != 'Semua':
         filtered_data = filtered_data[(filtered_data['product_category_name_english'] == jenis_produk) | (filtered_data['Tingkat Penjualan']==penjualan)]
 
     # Menentukan jumlah baris yang akan ditampilkan
-    if len(filtered_data) == len(Analisis):
+    if len(filtered_data) == len(output):
         num_rows = 50
     else:
         num_rows = len(filtered_data)
